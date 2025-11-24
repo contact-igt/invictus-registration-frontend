@@ -1,14 +1,76 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Zap, Check, Shield, Lock } from 'lucide-react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useRouter } from 'next/router';
 
 const Hero = () => {
+    const router = useRouter();
+    const [formStatus, setFormStatus] = useState('idle'); // idle, submitting, success, error
+    const [error, setError] = useState('');
+
+    const formik = useFormik({
+        initialValues: {
+            name: "",
+            mobile: "",
+            email: "",
+            business_type: "",
+        },
+        validationSchema: Yup.object({
+            name: Yup.string().required("Name required"),
+            mobile: Yup.string()
+                .matches(/^[0-9]{10}$/, "Mobile number must be 10 digits")
+                .required("Mobile required"),
+            email: Yup.string().email("Invalid email address"),
+            business_type: Yup.string().required("Business type required"),
+        }),
+        validateOnBlur: true,
+        validateOnChange: true,
+        onSubmit: async (values) => {
+            setFormStatus("submitting");
+            setError('');
+            try {
+                const ipResponse = await fetch("https://api.ipify.org?format=json");
+                const ipData = await ipResponse.json();
+
+                const newFormData = {
+                    name: values.name,
+                    mobile: values.mobile,
+                    email: values.email,
+                    business_type: values.business_type,
+                    ip_address: ipData.ip,
+                    utm_source: localStorage.getItem("utm_source"),
+                };
+
+                await fetch(
+                    "https://script.google.com/macros/s/AKfycbySu9mx0Vwv2EPdZKKbDOUUHKF1x-OecM6z_s2OOMFm9tLVu39zUZExmtsQeZz-InwZ/exec",
+                    {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: new URLSearchParams(newFormData).toString(),
+                    }
+                );
+
+                formik.resetForm();
+                setFormStatus("success");
+                router.push("/thank-you");
+            } catch (err) {
+                setError("Something went wrong. Please try again.");
+                setFormStatus("idle");
+            }
+        },
+    });
+
     return (
         <section className="relative pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden bg-[#050505]">
             {/* Grid Background */}
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_100%)] animate-[pulse_8s_infinite]"></div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-16 items-center">
 
                     <div className="text-left">
                         <div className="flex items-center gap-2 text-[#00DC82] text-xs font-bold uppercase tracking-[0.2em] mb-6 animate-fade-in-up">
@@ -71,33 +133,85 @@ const Hero = () => {
                             <h3 className="text-2xl font-sans font-bold text-white mb-2 uppercase tracking-tight">Claim Your Spot</h3>
                             <p className="text-gray-400 text-sm mb-8">Lock in the Free Hosting offer before it expires.</p>
 
-                            <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); alert('Request sent! We will contact you shortly.'); }}>
+                            <form className="space-y-5" onSubmit={formik.handleSubmit}>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Name</label>
-                                        <input type="text" className="w-full bg-[#1a1a1a] border border-white/10 text-white p-3 text-sm focus:outline-none focus:border-[#00DC82] focus:bg-[#00DC82]/5 transition-all duration-300" placeholder="John Doe" required />
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={formik.values.name}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            className="w-full bg-[#1a1a1a] border border-white/10 text-white p-3 text-sm focus:outline-none focus:border-[#00DC82] focus:bg-[#00DC82]/5 transition-all duration-300"
+                                            placeholder="John Doe"
+                                        />
+                                        {formik.touched.name && formik.errors.name && (
+                                            <p className="text-red-500 text-xs mt-1">{formik.errors.name}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Phone</label>
-                                        <input type="tel" className="w-full bg-[#1a1a1a] border border-white/10 text-white p-3 text-sm focus:outline-none focus:border-[#00DC82] focus:bg-[#00DC82]/5 transition-all duration-300" placeholder="+91..." required />
+                                        <input
+                                            type="tel"
+                                            name="mobile"
+                                            value={formik.values.mobile}
+                                            onChange={formik.handleChange}
+                                            onBlur={formik.handleBlur}
+                                            className="w-full bg-[#1a1a1a] border border-white/10 text-white p-3 text-sm focus:outline-none focus:border-[#00DC82] focus:bg-[#00DC82]/5 transition-all duration-300"
+                                            placeholder="9876543210"
+                                        />
+                                        {formik.touched.mobile && formik.errors.mobile && (
+                                            <p className="text-red-500 text-xs mt-1">{formik.errors.mobile}</p>
+                                        )}
                                     </div>
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Email</label>
-                                    <input type="email" className="w-full bg-[#1a1a1a] border border-white/10 text-white p-3 text-sm focus:outline-none focus:border-[#00DC82] focus:bg-[#00DC82]/5 transition-all duration-300" placeholder="john@company.com" required />
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formik.values.email}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        className="w-full bg-[#1a1a1a] border border-white/10 text-white p-3 text-sm focus:outline-none focus:border-[#00DC82] focus:bg-[#00DC82]/5 transition-all duration-300"
+                                        placeholder="john@company.com"
+                                    />
+                                    {formik.touched.email && formik.errors.email && (
+                                        <p className="text-red-500 text-xs mt-1">{formik.errors.email}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Business Type</label>
-                                    <select className="w-full bg-[#1a1a1a] border border-white/10 text-white p-3 text-sm focus:outline-none focus:border-[#00DC82] focus:bg-[#00DC82]/5 transition-all duration-300">
+                                    <select
+                                        name="business_type"
+                                        value={formik.values.business_type}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        className="w-full bg-[#1a1a1a] border border-white/10 text-white p-3 text-sm focus:outline-none focus:border-[#00DC82] focus:bg-[#00DC82]/5 transition-all duration-300"
+                                    >
+                                        <option value="">Select Business Type</option>
                                         <option>E-commerce</option>
                                         <option>Corporate / Business</option>
                                         <option>Portfolio / Personal</option>
                                         <option>Landing Page</option>
                                         <option>Other</option>
                                     </select>
+                                    {formik.touched.business_type && formik.errors.business_type && (
+                                        <p className="text-red-500 text-xs mt-1">{formik.errors.business_type}</p>
+                                    )}
                                 </div>
-                                <button type="submit" className="w-full bg-[#00DC82] text-black font-bold uppercase tracking-wider py-4 mt-4 hover:bg-[#00b368] hover:shadow-[0_0_20px_rgba(0,220,130,0.4)] hover:-translate-y-1 transition-all duration-300">
-                                    Request Callback
+
+                                {error && (
+                                    <p className="text-red-500 text-sm text-center">{error}</p>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={formStatus === 'submitting'}
+                                    className="w-full bg-[#00DC82] text-black font-bold uppercase tracking-wider py-4 mt-4 hover:bg-[#00b368] hover:shadow-[0_0_20px_rgba(0,220,130,0.4)] hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {formStatus === 'submitting' ? 'Submitting...' : 'Request Callback'}
                                 </button>
                                 <p className="text-[10px] text-center text-gray-500 mt-4 uppercase tracking-wider flex justify-center items-center gap-1">
                                     <Lock size={10} className="text-[#00DC82]" /> No spam. 100% Secure.

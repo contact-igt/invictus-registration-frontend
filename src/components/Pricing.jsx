@@ -35,7 +35,15 @@ const Pricing = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <button className={`w-full py-4 uppercase font-bold text-xs tracking-wider border ${plan.popular ? 'bg-[#00DC82] text-black border-[#00DC82] hover:bg-[#00b368] hover:text-black' : 'bg-transparent text-white border-white/20 hover:border-[#00DC82] hover:text-[#00DC82] hover:bg-[#00DC82]/5'} transition-all duration-300`}>
+                            <button
+                                onClick={() => {
+                                    const formElement = document.getElementById('hero-form');
+                                    if (formElement) {
+                                        formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }
+                                }}
+                                className={`w-full py-4 uppercase font-bold text-xs tracking-wider border ${plan.popular ? 'bg-[#00DC82] text-black border-[#00DC82] hover:bg-[#00b368] hover:text-black' : 'bg-transparent text-white border-white/20 hover:border-[#00DC82] hover:text-[#00DC82] hover:bg-[#00DC82]/5'} transition-all duration-300`}
+                            >
                                 Start Project
                             </button>
                         </div>
