@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 
-const Pricing = () => {
+const Pricing = ({setSelectedPlan}) => {
     const plans = [
         { name: "Starter", price: "₹4,999", features: ["1 Page Website", "Basic SEO", "Mobile Responsive", "Contact Form"] },
         { name: "Business", price: "₹14,999", popular: true, features: ["5 Page Website", "Advanced SEO", "WhatsApp Integration", "Speed Optimization", "CMS Setup"] },
@@ -37,6 +37,7 @@ const Pricing = () => {
                             </ul>
                             <button
                                 onClick={() => {
+                                    setSelectedPlan(plan.name);
                                     const formElement = document.getElementById('hero-form');
                                     if (formElement) {
                                         formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });

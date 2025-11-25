@@ -4,9 +4,9 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/router';
 
-const Hero = () => {
+const Hero = ({selectedPlan}) => {
     const router = useRouter();
-    const [formStatus, setFormStatus] = useState('idle'); // idle, submitting, success, error
+    const [formStatus, setFormStatus] = useState('idle');
     const [error, setError] = useState('');
 
     const formik = useFormik({
@@ -15,7 +15,9 @@ const Hero = () => {
             mobile: "",
             email: "",
             business_type: "",
+            choose_plan: selectedPlan || "",
         },
+        enableReinitialize: true, 
         validationSchema: Yup.object({
             name: Yup.string().required("Name required"),
             mobile: Yup.string()
@@ -23,6 +25,7 @@ const Hero = () => {
                 .required("Mobile required"),
             email: Yup.string().email("Invalid email address"),
             business_type: Yup.string().required("Business type required"),
+            choose_plan: Yup.string().required("Plan selection is required"),
         }),
         validateOnBlur: true,
         validateOnChange: true,
@@ -38,12 +41,13 @@ const Hero = () => {
                     mobile: values.mobile,
                     email: values.email,
                     business_type: values.business_type,
+                    choose_plan: values.choose_plan,
                     ip_address: ipData.ip,
                     utm_source: localStorage.getItem("utm_source"),
                 };
 
                 await fetch(
-                    "https://script.google.com/macros/s/AKfycbySu9mx0Vwv2EPdZKKbDOUUHKF1x-OecM6z_s2OOMFm9tLVu39zUZExmtsQeZz-InwZ/exec",
+                    "https://script.google.com/macros/s/AKfycbwFSQeofQcEb6v6-360Ak1sOn5uMcWEFsdAryMSlPhxt7c5EXgJZFmzK1cEOfQVVMzm/exec",
                     {
                         method: "POST",
                         mode: "no-cors",
@@ -202,10 +206,27 @@ const Hero = () => {
                                     )}
                                 </div>
 
+                                <div>
+                                    <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Choose Your Plan</label>
+                                    <select
+                                        name="choose_plan"
+                                        value={formik.values.choose_plan}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        className="w-full bg-[#1a1a1a] border border-white/10 text-white p-3 text-sm focus:outline-none focus:border-[#00DC82] focus:bg-[#00DC82]/5 transition-all duration-300"
+                                    >
+                                        <option value="">Select Plan</option>
+                                        <option>Starter</option>
+                                        <option>Business</option>
+                                        <option>Premium</option>
+                                    </select>
+                                    {formik.touched.choose_plan && formik.errors.choose_plan && (
+                                        <p className="text-red-500 text-xs mt-1">{formik.errors.choose_plan}</p>
+                                    )}
+                                </div>
                                 {error && (
                                     <p className="text-red-500 text-sm text-center">{error}</p>
                                 )}
-
                                 <button
                                     type="submit"
                                     disabled={formStatus === 'submitting'}
