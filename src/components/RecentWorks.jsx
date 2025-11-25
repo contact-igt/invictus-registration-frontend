@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 
 const RecentWorks = () => {
     const projects = [
-        { title: "HealthPilot AI", cat: "Healthcare", url: "www.healthpilot.ai", img: "/healthpilot-cover.png" },
+        { title: "KR Institute", cat: "Healthcare", url: "www.krinstitute.sg", img: "/kr-institute.png" },
         { title: "Ophthall Hospitals", cat: "Medical", url: "www.ophthall.in", img: "/ophthall-cover.png" },
         { title: "VLS Law Academy", cat: "Education", url: "www.vlslawacademy.com", img: "/vls-cover.png" },
         { title: "Sri Krish Mirra", cat: "Construction", url: "www.srikrishmirrabuilders.in", img: "/srikrishmirra-cover.png" },
@@ -29,7 +29,7 @@ const RecentWorks = () => {
                         <a key={i} href={`https://${p.url}`} target="_blank" rel="noreferrer" className="group block bg-[#1a1a1a] border border-white/5 hover:border-[#00DC82] transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
                             <div className="relative h-56 overflow-hidden bg-black">
                                 <div className="absolute inset-0 bg-[#00DC82]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 mix-blend-overlay"></div>
-                                <img src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100 grayscale group-hover:grayscale-0" />
+                                <img src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 group-hover:opacity-100" />
                             </div>
                             <div className="p-6">
                                 <div className="text-[10px] text-[#00DC82] font-mono mb-2 uppercase">{p.cat}</div>

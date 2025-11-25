@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import ValueProps from '../components/ValueProps';
@@ -17,6 +17,7 @@ import Footer from '../components/Footer';
 import Head from 'next/head';
 
 export default function Home() {
+    const [selectedPlan, setSelectedPlan] = useState(null);
     return (
         <div className="font-sans bg-[#050505] text-white selection:bg-[#00DC82] selection:text-black">
             <Head>
@@ -29,12 +30,12 @@ export default function Home() {
             </div>
 
             <Navbar />
-            <Hero />
+            <Hero selectedPlan={selectedPlan} />
             <ValueProps />
             <RecentWorks />
             <Testimonials />
             <ClientLogoStrip />
-            <Pricing />
+            <Pricing setSelectedPlan={setSelectedPlan} />
             <Timeline />
             <ComparisonTable />
             <TargetAudience />
